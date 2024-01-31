@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
+import config from '../config.json'
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
+const endpoint="auth/signup"
 
 const SignUp = () => {
-  
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     name: '',
@@ -10,7 +14,7 @@ const SignUp = () => {
   });
 
   const [passwordError, setPasswordError] = useState('');
-
+  const [error, setError]=useState('');
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -19,6 +23,7 @@ const SignUp = () => {
 
 
   const validatePassword = () => {
+    setPasswordError('')
     const { password } = formData;
 
     // Password requirements
@@ -42,9 +47,25 @@ const SignUp = () => {
   };
 
   const handleSignUp = async () => {
-    validatePassword();
-    // Send POST request to backend for user registration
-    // Redirect to application page on success
+    setError('')
+    
+    axios.post(config+endpoint, formData)
+    .then((response) => {
+
+      console.log("response....",response);
+       navigate('/application');
+      
+    })
+    .catch((error) => {
+      
+      console.error('Authentication failed:',error.response.data.message);
+      console.log("statsucode...",error.response.status)
+      if((error.response.status)===409){
+        console.log("conflict")
+      }
+      setError(error.response.data.message); 
+    });
+
   };
 
   return (
@@ -60,6 +81,7 @@ const SignUp = () => {
         <label>Password: </label>
         <input type="password" name="password" onChange={handleInputChange} onBlur={validatePassword}/>
         {passwordError && <div style={{ color: 'red' }}>{passwordError}</div>}
+        {error && <div style={{ color: 'red' }}>{error}</div>}
         <br />
         <button type="button" onClick={handleSignUp}>
           Sign Up

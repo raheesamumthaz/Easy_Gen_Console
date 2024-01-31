@@ -6,7 +6,8 @@ import { AuthModule } from './auth/auth.module';
   imports: [
     // MongooseModule.forRoot('mongodb://localhost/EasyGenConsole'),
 
-    MongooseModule.forRoot('mongodb+srv://r4raheesamumthaz:admin123@cluster0.ujrapcs.mongodb.net/EasyGenConsole?retryWrites=true&w=majority'),
+
+    MongooseModule.forRoot('mongodb+srv://admin:admin123@cluster0.ujrapcs.mongodb.net/'),
     AuthModule],
   controllers: [],
   providers: [],
