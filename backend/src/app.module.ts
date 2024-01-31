@@ -1,10 +1,14 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { MongooseModule } from '@nestjs/mongoose';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    // MongooseModule.forRoot('mongodb://localhost/EasyGenConsole'),
+
+    MongooseModule.forRoot('mongodb+srv://r4raheesamumthaz:admin123@cluster0.ujrapcs.mongodb.net/EasyGenConsole?retryWrites=true&w=majority'),
+    AuthModule],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
