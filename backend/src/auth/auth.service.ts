@@ -17,7 +17,7 @@ export class AuthService {
       const hashedPassword = await bcrypt.hash(body.password, 10);
       const user = new this.userModel({ ...body, password: hashedPassword });
       await user.save()
-      return ("User Registration Completed")
+      return (user)
       
       
     } catch (err) {
@@ -54,7 +54,7 @@ export class AuthService {
         
       }
 
-      return ('User authenticated successfully');
+      return (user);
     }
     catch (err) {
       console.log("err...", err.message)

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import config from '../config.json'
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import './Auth.css'; 
 
 const endpoint=config.apiUrl+"/auth/signup"
 
@@ -10,10 +11,9 @@ const SignUp = () => {
   const [formData, setFormData] = useState({
     email: '',
     name: '',
-    password: '',
-    signIn: false
+    password: ''
   });
-
+  const [signIn, setSignin] = useState(false); 
   const [passwordError, setPasswordError] = useState('');
   const [error, setError]=useState('');
   const handleInputChange = (e) => {
@@ -50,11 +50,12 @@ const SignUp = () => {
 
   const handleSignUp = async () => {
     setError('')
-    setFormData({ ...formData, ["signIn"]: false });
+    setSignin(false)
     axios.post(endpoint, formData)
     .then((response) => {
 
       console.log("response....",response);
+      localStorage.setItem('user', response.data.name);
        navigate('/application');
       
     })
@@ -64,7 +65,7 @@ const SignUp = () => {
       setError(error.response.data.message); 
       console.log("statsucode...",error.response.status)
       if((error.response.status)===409){
-        setFormData({ ...formData, ["signIn"]: true });
+        setSignin(true)
         console.log("please signin")
       }
       
@@ -77,30 +78,31 @@ const SignUp = () => {
   }
 
   return (
-    <div>
-      <h2>Sign Up</h2>
-      <form>
+    <div className="auth-container">
+      <h2> EasyGen Sign Up</h2>
+      <form className="auth-form">  
         <label>Email: </label>
-        <input type="email" name="email" onChange={handleInputChange} />
+        <input type="email" name="email" className="auth-input" onChange={handleInputChange} />
         <br />
         <label>Name: </label>
-        <input type="text" name="name" onChange={handleInputChange} />
+        <input type="text" name="name" className="auth-input" onChange={handleInputChange} />
         <br />
         <label>Password: </label>
-        <input type="password" name="password" onChange={handleInputChange} onBlur={validatePassword}/>
-        {passwordError && <div style={{ color: 'red' }}>{passwordError}</div>}
+        <input type="password" name="password" className="auth-input" onChange={handleInputChange} onBlur={validatePassword}/>
+        {passwordError && <div className="error-message">{passwordError}</div>}
+     
        
         <br />
-        <button type="button" onClick={handleSignUp}>
+        <button type="button" className="auth-button" onClick={handleSignUp}>
           Sign Up
         </button>
         <br />
-        {error && <div style={{ color: 'red' }}>{error}</div>}
+        {error && <div className="error-message">{error}</div>}
 
 
 
-        {formData.signIn &&(
-          <button type="button" onClick={handleSignIn}>
+        {signIn &&(
+          <button type="button"  className="auth-button secondary-button" onClick={handleSignIn}>
             Sign In
           </button>
         )}
