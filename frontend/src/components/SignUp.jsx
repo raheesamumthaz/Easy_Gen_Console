@@ -3,7 +3,7 @@ import config from '../config.json'
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-const endpoint="auth/signup"
+const endpoint=config.apiUrl+"/auth/signup"
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -11,6 +11,7 @@ const SignUp = () => {
     email: '',
     name: '',
     password: '',
+    signIn: false
   });
 
   const [passwordError, setPasswordError] = useState('');
@@ -18,6 +19,7 @@ const SignUp = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+    
   };
 
 
@@ -48,8 +50,8 @@ const SignUp = () => {
 
   const handleSignUp = async () => {
     setError('')
-    
-    axios.post(config+endpoint, formData)
+    setFormData({ ...formData, ["signIn"]: false });
+    axios.post(endpoint, formData)
     .then((response) => {
 
       console.log("response....",response);
@@ -59,14 +61,20 @@ const SignUp = () => {
     .catch((error) => {
       
       console.error('Authentication failed:',error.response.data.message);
+      setError(error.response.data.message); 
       console.log("statsucode...",error.response.status)
       if((error.response.status)===409){
-        console.log("conflict")
+        setFormData({ ...formData, ["signIn"]: true });
+        console.log("please signin")
       }
-      setError(error.response.data.message); 
+      
     });
 
   };
+
+  const handleSignIn=()=>{
+    navigate('/signin');
+  }
 
   return (
     <div>
@@ -81,11 +89,22 @@ const SignUp = () => {
         <label>Password: </label>
         <input type="password" name="password" onChange={handleInputChange} onBlur={validatePassword}/>
         {passwordError && <div style={{ color: 'red' }}>{passwordError}</div>}
-        {error && <div style={{ color: 'red' }}>{error}</div>}
+       
         <br />
         <button type="button" onClick={handleSignUp}>
           Sign Up
         </button>
+        <br />
+        {error && <div style={{ color: 'red' }}>{error}</div>}
+
+
+
+        {formData.signIn &&(
+          <button type="button" onClick={handleSignIn}>
+            Sign In
+          </button>
+        )}
+       
       </form>
     </div>
   );

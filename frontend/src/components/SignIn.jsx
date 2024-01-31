@@ -1,33 +1,49 @@
 import React, { useState } from 'react';
+import config from '../config.json'
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
+const endpoint=config.apiUrl+"/auth/signin"
 const SignIn = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
+    signUp: false
   });
-
+  const [error, setError]=useState('');
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
   const handleSignIn = () => {
-    // Add logic to send the form data to the backend for authentication
-    // For simplicity, let's assume a function called authenticateUser exists
-
-    authenticateUser(formData)
+   
+    setError('')
+    setFormData({ ...formData, ["signUp"]: false });
+    axios.post(endpoint, formData)
       .then((response) => {
-        // Handle successful authentication, e.g., redirect to the application page
+     
         console.log('User authenticated successfully');
-        // Add redirect logic here
+        navigate('/application');
       })
       .catch((error) => {
-        // Handle authentication failure, e.g., display an error message
-        console.error('Authentication failed:', error.message);
-        // Add error handling logic here
+        
+        
+        console.error('Authentication failed:',error.response.data.message,error);
+        setError(error.response.data.message); 
+        console.log("statsucode...",error.response.status)
+        if((error.response.status)===404){
+          setFormData({ ...formData, ["signUp"]: true });
+          console.log("please signup")
+        }
+       
+       
       });
   };
-
+  const handleSignUp=()=>{
+    navigate('/signup');
+  }
   return (
     <div>
       <h2>Sign In</h2>
@@ -41,6 +57,13 @@ const SignIn = () => {
         <button type="button" onClick={handleSignIn}>
           Sign In
         </button>
+        <br />
+        {error && <div style={{ color: 'red' }}>{error}</div>}
+        {formData.signUp &&(
+          <button type="button" onClick={handleSignUp}>
+            Sign Up
+          </button>
+        )}
       </form>
     </div>
   );

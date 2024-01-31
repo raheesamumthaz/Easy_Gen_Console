@@ -2,7 +2,7 @@ import { Injectable ,ConflictException} from '@nestjs/common';
 import { InjectModel } from "@nestjs/mongoose";
 import { Model ,Error as MongooseError } from "mongoose";
 import { DuplicateException,CustomException } from './exceptions';
-import { User, UserDocument } from "../user/user.model";
+import { User, UserDocument,UserSchema } from "../user/user.model";
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -38,24 +38,37 @@ export class AuthService {
     return error["code"]=== 11000;
   }
 
+  //signin service
+
   async signIn(body: { email: string; password: string }) {
-    // try {
-    //   const user = await UserModel.findOne({ email: body.email }).maxTimeMS(20000);
-    //   if (!user) {
-    //     throw new Error('Email is not registered, please signup');
-    //   }
+    try {
+      const user = await this.userModel.findOne({ email: body.email });
+      console.log("email...,",user)
+      if (!user) {
+       throw new Error('not found')
+       
+      }
+      const isPasswordValid = await bcrypt.compare(body.password, user.password);
+      if (!isPasswordValid) {
+        throw new Error('invalid password');
+        
+      }
 
-    //   const isPasswordValid = await bcrypt.compare(body.password, user.password);
-    //   if (!isPasswordValid) {
-    //     throw new Error('Invalid password');
-    //   }
-
-    //   return { message: 'User authenticated successfully' };
-    // }
-    // catch (err) {
-    //   console.log("err...", err)
-    //   return { err };
-    // }
+      return ('User authenticated successfully');
+    }
+    catch (err) {
+      console.log("err...", err.message)
+      if(err.message=="not found")
+      {
+        console.log("yes")
+        throw new CustomException('Email is not registered, please signup',404);
+      }
+       
+      else if(err.message=="invalid password")
+      throw new CustomException('Invalid password');
+       else
+      throw new CustomException('Something went wrong while user signin');
+    }
 
   }
 }

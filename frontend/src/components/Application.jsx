@@ -3,7 +3,7 @@ import React from 'react';
 const Application = () => {
   return (
     <div>
-      <h2>Welcome to the application.</h2>
+      <h2>Welcome to EasyGen Console application.</h2>
     </div>
   );
 };
